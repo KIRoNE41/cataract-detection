@@ -1,4 +1,4 @@
-opencv-python-contrib-headless
+opencv-python-contrib
 Pillow
 streamlit
 numpy
