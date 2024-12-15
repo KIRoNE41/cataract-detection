@@ -8,8 +8,21 @@ from ultralytics import YOLO
 def app():
     st.header('วินิฉัยโรคต้อกระจก')
     st.subheader('ทำงานด้วย AI ')
+    st.subheader('จัดทำโดย')
+    st.write('นายวชิรภัทร แก้วมะลัง')
+    st.write('นายอัฟฟาน เจ๊ะมะ')
     st.write('อัปโหลดรูปภาพหน้าตรง')
     st.image('requirement.png')
+    
+    hide_st_style = """
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                header {visibility: hidden;}
+                </style>
+                """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
+
     # Load a pretrained YOLO11n model
     model = YOLO("model/eye-detect.pt")
     model_cls = YOLO("model/cataract-cls.pt")  # load a custom model
