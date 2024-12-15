@@ -4,7 +4,6 @@ import streamlit as st
 import numpy as np
 from ultralytics import YOLO
 import os
-from streamlit_overlay import overlay
 
 
 def app():
