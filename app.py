@@ -3,9 +3,14 @@ from PIL import Image
 import streamlit as st
 import numpy as np
 from ultralytics import YOLO
+import os
+from streamlit_overlay import overlay
 
 
 def app():
+    global uploaded_file,source
+    source = None  # กำหนดค่าเริ่มต้นให้กับ source
+    uploaded_file = None
     st.header('วินิฉัยโรคต้อกระจก')
     st.subheader('ทำงานด้วย AI ')
     st.subheader('จัดทำโดย')
@@ -13,7 +18,7 @@ def app():
     st.write('นายอัฟฟาน เจ๊ะมะ')
     st.write('อัปโหลดรูปภาพหน้าตรง')
     st.image('requirement.png')
-    
+    upbutton = st.empty
     hide_st_style = """
                 <style>
                 #MainMenu {visibility: hidden;}
@@ -23,18 +28,39 @@ def app():
                 """
     st.markdown(hide_st_style, unsafe_allow_html=True)
 
+    # Streamlit app title
+    # Start the camera on button click
+    st.button("Start Camera", key="start_camera_button",on_click=cam_button,use_container_width=True)
+    
+    if "cam" in st.session_state:
+        capture_image()
+
+    if "upload" in st.session_state :
+        st.session_state.cam = False
+        st.session_state.upload = False
+
+    if "cam" not in st.session_state:
+
+        st.session_state.starting = False
+        st.session_state.cam = False
+        
+        with st.form("my_form"):
+            uploaded_file = st.file_uploader("Upload video", type=("jpg", "jpeg", "png"))
+            #min_confidence = st.slider('Confidence score', 0.0, 1.0,0.5)
+            st.form_submit_button(label='Submit')
+
+
     # Load a pretrained YOLO11n model
     model = YOLO("model/eye-detect.pt")
     model_cls = YOLO("model/cataract-cls.pt")  # load a custom model
 
-    with st.form("my_form"):
-        uploaded_file = st.file_uploader("Upload video", type=("jpg", "jpeg", "png"))
-        #min_confidence = st.slider('Confidence score', 0.0, 1.0,0.5)
-        st.form_submit_button(label='Submit')
-
-    if uploaded_file is not None:
-        file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
-        source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # Decode the image from the binary stream
+    
+    if (uploaded_file is not None )or (source is not None):
+        if uploaded_file is not None:
+            file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
+            source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # Decode the image from the binary stream
+        if source is not None:
+            pass
         st.image(source, channels="BGR")  # Display the uploaded image
 
 
@@ -83,7 +109,32 @@ def app():
         print(eyes)
 
         print("--Finished--")
+        st.title("--Finished--")
 
+def cap_button():
+    st.session_state.cap = True
+
+def cam_button():
+    st.session_state.cam = True
+    
+def up_button():
+    st.session_state.upload = True
+
+
+def capture_image():
+    frame_img_path = "frame3.png"
+    global uploaded_file,source
+    
+    cap = None
+    # st.button("Upload", key="upload_open",on_click=up_button,use_container_width=True)
+    cap = st.camera_input("TEST",label_visibility="hidden")
+    if cap is None:
+        st.info("Take a picture.")
+        return
+
+    if cap is not None:
+            file_bytes = np.frombuffer(cap.read(), np.uint8)
+            source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # Decode the image from the binary stream
 
 if __name__ == "__main__":
     app()
