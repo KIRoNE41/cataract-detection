@@ -50,6 +50,7 @@ def app():
     # การประมวลผลรูปภาพที่อัปโหลดหรือรูปภาพจากกล้อง
     if (uploaded_file is not None or source is not None):
         if uploaded_file is not None:
+            st.write("uploading")
             file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
             source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # แปลงภาพที่อัปโหลด
         
