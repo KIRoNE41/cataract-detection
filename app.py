@@ -87,8 +87,8 @@ def app():
                     st.image(ultralytics_crop_object, channels="BGR", caption=f'Eye {i+1}')
                     st.write(f'Eye {i+1} is {names_cls[1]}')
 
-            st.write("--All Results--")
-            st.write(eyes)
+            #st.write("--All Results--")
+            #st.write(eyes)
 
             st.title("--Finished--")
 
