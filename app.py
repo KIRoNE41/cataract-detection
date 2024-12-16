@@ -44,10 +44,10 @@ def app():
         st.session_state.starting = False
         st.session_state.cam = False
         
-        with st.form("my_form"):
-            uploaded_file = st.file_uploader("Upload video", type=("jpg", "jpeg", "png"))
+    with st.form("my_form"):
+        uploaded_file = st.file_uploader("Upload video", type=("jpg", "jpeg", "png"))
             #min_confidence = st.slider('Confidence score', 0.0, 1.0,0.5)
-            upbt= st.form_submit_button(label='Submit')
+        upbt= st.form_submit_button(label='Submit')
 
 
     # Load a pretrained YOLO11n model
