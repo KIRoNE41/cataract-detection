@@ -47,7 +47,7 @@ def app():
         with st.form("my_form"):
             uploaded_file = st.file_uploader("Upload video", type=("jpg", "jpeg", "png"))
             #min_confidence = st.slider('Confidence score', 0.0, 1.0,0.5)
-            st.form_submit_button(label='Submit',onclick=up_button,key="up_button")
+            st.form_submit_button(label='Submit')
 
 
     # Load a pretrained YOLO11n model
