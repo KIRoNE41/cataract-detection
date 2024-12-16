@@ -29,7 +29,7 @@ def app():
 
     # Streamlit app title
     # Start the camera on button click
-    st.button("Start Camera", key="start_camera_button",on_click=cam_button,use_container_width=True)
+    startbt=st.button("Start Camera", key="start_camera_button",on_click=cam_button,use_container_width=True)
     
     if "cam" in st.session_state:
         
