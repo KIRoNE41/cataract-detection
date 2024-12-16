@@ -7,7 +7,7 @@ import os
 
 def app():
     global uploaded_file, source
-    source = None  # Default value for source
+    source = None  # ค่าเริ่มต้นสำหรับ source
     uploaded_file = None
     st.header('วินิฉัยโรคต้อกระจก')
     st.subheader('ทำงานด้วย AI ')
@@ -16,7 +16,8 @@ def app():
     st.write('นายอัฟฟาน เจ๊ะมะ')
     st.write('อัปโหลดรูปภาพหน้าตรง')
     st.image('requirement.png')
-    
+
+    # ซ่อน UI ที่ไม่ต้องการ
     hide_st_style = """
                 <style>
                 #MainMenu {visibility: hidden;}
@@ -26,62 +27,63 @@ def app():
                 """
     st.markdown(hide_st_style, unsafe_allow_html=True)
 
-    # Hide unnecessary elements from the Streamlit UI
-    startbt = st.button("Start Camera", key="start_camera_button", on_click=cam_button)
+    # ปุ่มเปิดกล้อง
+    if st.button("Start Camera", key="start_camera_button"):
+        st.session_state.cam = True  # ตั้งค่าสถานะการเปิดกล้อง
 
+    # ตรวจสอบสถานะการเปิดกล้อง
     if "cam" not in st.session_state:
         st.session_state.cam = False
-        st.session_state.upload = False
 
-    # Check if the camera is started
+    # ถ้ากล้องถูกเปิด ให้เรียกฟังก์ชันจับภาพจากกล้อง
     if st.session_state.cam:
-        capture_image()  # Start capturing from the camera
+        capture_image()
 
-    # File upload section inside a form
+    # ส่วนการอัปโหลดไฟล์ (แยกจากปุ่มเปิดกล้อง)
     with st.form("my_form"):
         uploaded_file = st.file_uploader("Upload an image", type=("jpg", "jpeg", "png"))
         submit_button = st.form_submit_button(label='Submit')
 
-    # Load YOLO models
+    # โหลดโมเดล YOLO
     model = YOLO("model/eye-detect.pt")
-    model_cls = YOLO("model/cataract-cls.pt")  # load a custom model
+    model_cls = YOLO("model/cataract-cls.pt")
 
-    # Processing uploaded file or camera image
+    # การประมวลผลรูปภาพที่อัปโหลดหรือรูปภาพจากกล้อง
     if (uploaded_file is not None or source is not None):
         if uploaded_file is not None:
             file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
-            source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # Decode image from the binary stream
+            source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # แปลงภาพที่อัปโหลด
         
         if source is not None:
-            st.image(source, channels="BGR")  # Display the uploaded image
+            st.image(source, channels="BGR")  # แสดงภาพ
 
-            # Start Eye Detection
+            # เริ่มการตรวจจับดวงตา
             st.write("--Start EyesDetection--")
-            results = model(source)  # Run YOLO inference on the image
+            results = model(source)
             names = model.names
             eyes = {}
             eyes_image = {}
             boxes = results[0].boxes.xyxy.tolist()
 
-            # Visualize results
+            # แสดงผลลัพธ์
             for r in results:
-                im_bgr = r.plot()  # Plot the result image
-                im_rgb = Image.fromarray(im_bgr[..., ::-1])  # Convert BGR to RGB for display
+                im_bgr = r.plot()
+                im_rgb = Image.fromarray(im_bgr[..., ::-1])  # แปลง BGR เป็น RGB
                 r.save(filename=f"results.jpg")
+
                 for c in r.boxes.cls:
                     st.write(names[int(c)])
 
-                # Loop through each detected box (eye)
                 for i, box in enumerate(boxes):
                     x1, y1, x2, y2 = box
-                    ultralytics_crop_object = source[int(y1):int(y2), int(x1):int(x2)]  # Crop the eye region
+                    ultralytics_crop_object = source[int(y1):int(y2), int(x1):int(x2)]  # ตัดภาพดวงตา
                     st.write(f"--Start Classification for Eye {i+1}--")
-                    results_cls = model_cls(ultralytics_crop_object)  # Classify the eye
+                    results_cls = model_cls(ultralytics_crop_object)  # ทำการจำแนกประเภทของตา
                     names_cls = model_cls.names
                     eyes[f'eye{i}'] = names_cls[1]
                     eyes_image[f'eye{i}'] = ultralytics_crop_object
 
-                    # Save and display the cropped eye image
+                    # แสดงภาพดวงตาที่ถูกตัด
                     cv2.imwrite('ultralytics_crop_' + str(i) + '.jpg', ultralytics_crop_object)
                     st.image(ultralytics_crop_object, channels="BGR", caption=f'Eye {i+1}')
                     st.write(f'Eye {i+1} is {names_cls[1]}')
@@ -91,19 +93,13 @@ def app():
 
             st.title("--Finished--")
 
-def cam_button():
-    st.session_state.cam = True
-
 def capture_image():
-    frame_img_path = "frame3.png"
     global source
-
-    # Capture image from camera
     cap = st.camera_input("Take a picture", label_visibility="hidden")
-    
+
     if cap is not None:
         file_bytes = np.frombuffer(cap.read(), np.uint8)
-        source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # Decode the captured image
+        source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # แปลงภาพที่ถ่ายจากกล้อง
 
 if __name__ == "__main__":
     app()
