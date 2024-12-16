@@ -34,9 +34,9 @@ def app():
     # ตรวจสอบสถานะการเปิดกล้อง
     if "cam" not in st.session_state:
         st.session_state.cam = False
-        with st.form("my_form"):
-            uploaded_file = st.file_uploader("Upload an image", type=("jpg", "jpeg", "png"))
-            submit_button = st.form_submit_button(label='Submit')
+    with st.form("my_form"):
+        uploaded_file = st.file_uploader("Upload an image", type=("jpg", "jpeg", "png"))
+        submit_button = st.form_submit_button(label='Submit')
 
     
     # ถ้ากล้องถูกเปิด ให้เรียกฟังก์ชันจับภาพจากกล้อง
