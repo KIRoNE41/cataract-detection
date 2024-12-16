@@ -31,7 +31,7 @@ def app():
     # Start the camera on button click
     st.button("Start Camera", key="start_camera_button",on_click=cam_button,use_container_width=True)
     
-    if "cam" in st.session_state and  "upload" not in st.session_state:
+    if "cam" in st.session_state:
         
         capture_image()
 
