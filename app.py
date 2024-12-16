@@ -34,16 +34,15 @@ def app():
     # ตรวจสอบสถานะการเปิดกล้อง
     if "cam" not in st.session_state:
         st.session_state.cam = False
+        with st.form("my_form"):
+            uploaded_file = st.file_uploader("Upload an image", type=("jpg", "jpeg", "png"))
+            submit_button = st.form_submit_button(label='Submit')
 
+    
     # ถ้ากล้องถูกเปิด ให้เรียกฟังก์ชันจับภาพจากกล้อง
     if st.session_state.cam:
         capture_image()
-
-    # ส่วนการอัปโหลดไฟล์ (แยกจากปุ่มเปิดกล้อง)
-    with st.form("my_form"):
-        uploaded_file = st.file_uploader("Upload an image", type=("jpg", "jpeg", "png"))
-        submit_button = st.form_submit_button(label='Submit')
-
+        
     # โหลดโมเดล YOLO
     model = YOLO("model/eye-detect.pt")
     model_cls = YOLO("model/cataract-cls.pt")
