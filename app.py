@@ -50,7 +50,7 @@ def app():
     # การประมวลผลรูปภาพที่อัปโหลดหรือรูปภาพจากกล้อง
     if (uploaded_file is not None or source is not None):
         if uploaded_file is not None:
-            st.write("uploading")
+            #st.write("uploading")
             file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
             source = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)  # แปลงภาพที่อัปโหลด
         
@@ -58,7 +58,7 @@ def app():
             st.image(source, channels="BGR")  # แสดงภาพ
 
             # เริ่มการตรวจจับดวงตา
-            st.write("--Start EyesDetection--")
+            #st.write("--Start EyesDetection--")
             results = model(source)
             names = model.names
             eyes = {}
@@ -72,12 +72,13 @@ def app():
                 r.save(filename=f"results.jpg")
 
                 for c in r.boxes.cls:
-                    st.write(names[int(c)])
+                    #st.write(names[int(c)])
+                    pass
 
                 for i, box in enumerate(boxes):
                     x1, y1, x2, y2 = box
                     ultralytics_crop_object = source[int(y1):int(y2), int(x1):int(x2)]  # ตัดภาพดวงตา
-                    st.write(f"--Start Classification for Eye {i+1}--")
+                    #st.write(f"--Start Classification for Eye {i+1}--")
                     results_cls = model_cls(ultralytics_crop_object)  # ทำการจำแนกประเภทของตา
                     names_cls = model_cls.names
                     eyes[f'eye{i}'] = names_cls[1]
